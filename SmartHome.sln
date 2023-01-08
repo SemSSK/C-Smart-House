@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserServer", "UserServer\Us
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureDetectorServer", "TemperatureDetectorServer\TemperatureDetectorServer.csproj", "{C6DA9595-BA5F-438F-9E86-26D4A6C991FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HumidityDetectorServer", "HumidityDetectorServer\HumidityDetectorServer.csproj", "{11717E45-76A6-46F9-A399-223446857A5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{C6DA9595-BA5F-438F-9E86-26D4A6C991FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6DA9595-BA5F-438F-9E86-26D4A6C991FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6DA9595-BA5F-438F-9E86-26D4A6C991FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11717E45-76A6-46F9-A399-223446857A5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11717E45-76A6-46F9-A399-223446857A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11717E45-76A6-46F9-A399-223446857A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11717E45-76A6-46F9-A399-223446857A5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
