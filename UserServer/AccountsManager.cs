@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentResults;
@@ -5,18 +6,18 @@ using Interfaces;
 
 namespace UserServer
 {
-    public class AccountsManager : IAccountManager
+    public class AccountsManager :MarshalByRefObject , IAccountManager
     {
         private List<User> accounts = new List<User>
         {
             new User("Admin","1111",false)
         };
         
-        public Result<User> Login(string username, string password)
+        public User Login(string username, string password)
         {
-            var result  = accounts.FindAll(user => username == user.username &&
-                                  password == user.password);
-            return result.Count == 0 ? Result.Ok(result.First()) : Result.Fail("wrong credentials");
+            var result  = accounts.FindAll(user => username.Equals(user.username) &&
+                                  password.Equals(user.password));
+            return result.Count != 0 ? result.First() : null;
         }
 
         public void AddUser(string username, string password)

@@ -11,10 +11,10 @@ namespace UserServer
     {
         public static void Main(string[] args)
         {
-            var channel = new TcpChannel(3000);
+            var channel = new TcpChannel(Ports.USERPORT);
             ChannelServices.RegisterChannel(channel);
             RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(AccountsManager), "accounts",WellKnownObjectMode.Singleton);
+                typeof(AccountsManager), Names.ACCOUNTSNAME,WellKnownObjectMode.Singleton);
             Console.WriteLine("User Server is ready ...");
             Console.Read();
         }

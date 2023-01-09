@@ -2,6 +2,7 @@
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using Interfaces;
 
 namespace TemperatureDetectorServer
 
@@ -10,10 +11,10 @@ namespace TemperatureDetectorServer
     {
         public static void Main(string[] args)
         {
-            var channel = new TcpChannel(3001);
+            var channel = new TcpChannel(Ports.TEMPPORT);
             ChannelServices.RegisterChannel(channel);
             RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(Thermometer),"thermometer",WellKnownObjectMode.Singleton);
+                typeof(Thermometer),Names.TEMPNAME,WellKnownObjectMode.Singleton);
             Console.WriteLine("Temperature server ready ...");
             Console.ReadLine();
         }

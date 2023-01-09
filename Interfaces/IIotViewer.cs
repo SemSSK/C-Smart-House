@@ -4,6 +4,8 @@ namespace Interfaces
 {
     public interface IIotViewer<T>
     {
-        Result<T> GetValue();
+        void TurnOn();
+        void TurnOff();
+        T GetValue();
     }
 }

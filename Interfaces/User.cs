@@ -1,6 +1,8 @@
+using System;
+
 namespace Interfaces
 {
-    public class User
+    public class User : MarshalByRefObject
     {
         public User(string username, string password, bool isAdmin)
         {
