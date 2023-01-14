@@ -10,19 +10,21 @@ namespace UserServer
     {
         private List<User> accounts = new List<User>
         {
-            new User("Admin","1111",false)
+            new User("Admin","1111",true)
         };
         
         public User Login(string username, string password)
         {
-            var result  = accounts.FindAll(user => username.Equals(user.username) &&
+            var result  = GetUsers().FindAll(user => username.Equals(user.username) &&
                                   password.Equals(user.password));
             return result.Count != 0 ? result.First() : null;
         }
 
-        public void AddUser(string username, string password)
-        {
-            accounts.Add(new User(username,password,false));
-        }
+        public void AddUser(string username, string password) => new DataBaseAccessor()
+            .AddUser(username,password);
+
+        public List<User> GetUsers() => new DataBaseAccessor().GetUsers();
+
+        public void RemoveUser(int id) => new DataBaseAccessor().DeleteUser(id);
     }
 }

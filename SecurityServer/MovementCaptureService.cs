@@ -4,10 +4,10 @@ using Interfaces;
 
 namespace SecurityServer
 {
-    public class MovementCaptureService : MarshalByRefObject, IIotViewer<List<MovementCaptureService>>
+    public class MovementCaptureService : MarshalByRefObject, IIotViewer<List<MovementData>>
     {
         private bool state = true;
-        private List<MovementCaptureService> captures = new List<MovementCaptureService>();
+        private List<MovementData> captures = new List<MovementData>();
         public void TurnOn()
         {
             state = true;
@@ -18,7 +18,7 @@ namespace SecurityServer
             state = false;
         }
 
-        public List<MovementCaptureService> GetValue()
+        public List<MovementData> GetValue()
         {
             return captures;
         }

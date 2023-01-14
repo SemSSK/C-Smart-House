@@ -6,5 +6,6 @@ namespace Interfaces
         public const int TEMPPORT = 3001;
         public const int HUMIDITYPORT = 3002;
         public const int SECUREPORT = 3003;
+        public const int REQPORT = 3004;
     }
 }

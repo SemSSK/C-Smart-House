@@ -4,7 +4,7 @@ using Interfaces;
 
 namespace SecurityServer
 {
-    public class CameraService : MarshalByRefObject, IIotViewer<FileStream>
+    public class CameraService : MarshalByRefObject, IIotViewer<Stream>
     {
         private bool state = true;
         public void TurnOn()
@@ -17,7 +17,7 @@ namespace SecurityServer
             state = false;
         }
 
-        public FileStream GetValue()
+        public Stream GetValue()
         {
             return File.OpenRead("/home/semssk/Dev/Csharp/SmartHome/Hello.txt");
         }

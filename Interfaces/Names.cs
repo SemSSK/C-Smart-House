@@ -7,6 +7,7 @@ namespace Interfaces
             TEMPNAME = "thermometer",
             CAMERANAME = "security/camera",
             DOORNAME = "security/door",
-            MOVENAME = "security/Capture";
+            MOVENAME = "security/Capture",
+            REQNAME = "request";
     }
 }

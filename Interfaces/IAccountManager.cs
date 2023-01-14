@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using FluentResults;
 
 namespace Interfaces
@@ -6,5 +8,7 @@ namespace Interfaces
     {
         User Login(string username, string password);
         void AddUser(string username, string password);
+        List<User> GetUsers();
+        void RemoveUser(int id);
     }
 }
