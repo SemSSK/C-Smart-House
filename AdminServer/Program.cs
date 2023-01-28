@@ -25,6 +25,11 @@ namespace AdminServer
                 AllowCors(context.Context);
                 Utils.WriteToResponse(context.Context,"");
             });
+            server.AddView(new URL("/lock",HttpMethods.GET), context =>
+            {
+                AllowCors(context.Context);
+                Utils.WriteToResponse(context.Context,"Hey");
+            });
             server.AddView(new URL("/temperature",HttpMethods.GET), context =>
             {
                 AllowCors(context.Context);
@@ -69,7 +74,7 @@ namespace AdminServer
                         .WriteToResponse(serveritoContext.Context,json);
                 });
             });
-            server.AddView(new URL("/lock",HttpMethods.GET), context =>
+            server.AddView(new URL("/lockstate",HttpMethods.GET), context =>
             {
                 AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
