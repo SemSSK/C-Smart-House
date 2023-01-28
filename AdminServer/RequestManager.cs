@@ -6,18 +6,21 @@ namespace AdminServer
 {
     public class RequestManager : MarshalByRefObject,IRequestManager
     {
-        private static Queue<string> requests = new Queue<string>();
-        public string requestOpening()
+        public string requestOpening(string username)
         {
-            var s = "[Request]:" + DateTime.Now.ToString();
-            requests.Enqueue(s);
-            Console.WriteLine(s);
+            var request = new DoorRequest()
+            {
+                username = username,
+                time = DateTime.Now.ToString()
+            };
+            new DatabaseAccessor().AddDoorRequest(request);
+            Console.WriteLine("{0}:Requested for door to open",request.username);
             return "request transfered successfully";
         }
 
-        public static string getRequest()
+        public static List<DoorRequest> getRequest()
         {
-            return requests.Peek() is null ? null : requests.Dequeue();
+            return new DatabaseAccessor().GetDoorRequests();
         }
     }
 }

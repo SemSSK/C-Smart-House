@@ -33,6 +33,23 @@ namespace UserServer
             }
         }
 
+        public void UpdateUser(User user)
+        {
+            Console.WriteLine("Hey");
+            const string sql = @"UPDATE users SET username = @username,password = @password WHERE id = @id";
+            using (var connection = new DatabaseConnector().GetConnetion())
+            {
+                if (connection.Execute(sql,new {username = user.username,id = user.Id,password=user.password}) == 1)
+                {
+                    Console.WriteLine("Users updated successfully");
+                }
+                else
+                {
+                    Console.WriteLine("A failure has occured");
+                }
+            }
+        }
+
         public void DeleteUser(int id)
         {
             const string sql = "DELETE FROM users Where id = @id";
@@ -48,5 +65,7 @@ namespace UserServer
                 }
             }
         }
+        
+        
     }
 }

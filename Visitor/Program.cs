@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using Dapper;
 using Interfaces;
 using Newtonsoft.Json;
 using Serverito;
@@ -11,12 +8,17 @@ namespace Visitor
 {
     internal class Program
     {
-        private static Dictionary<string, User> loggedInUsers = new Dictionary<string, User>();
         public static void Main(string[] args)
         {
             var server = new ServeritoListener();
+            server.AddView(new URL("/",HttpMethods.OPTIONS,UrlMatchingType.StartsWith), context =>
+            {
+                AllowCors(context.Context);
+                Utils.WriteToResponse(context.Context,"");
+            });
             server.AddView(new URL("/temperature",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context,serveritoContext => 
                     Utils
                     .WriteToResponse(context.Context,new TemperatureViewer().GetTemperature()
@@ -26,6 +28,7 @@ namespace Visitor
             } );
             server.AddView(new URL("/humidity",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context,serveritoContext => 
                     Utils
                         .WriteToResponse(context.Context,new HumidityViewer()
@@ -35,13 +38,27 @@ namespace Visitor
             } );
             server.AddView(new URL("/opendoor",HttpMethods.POST),context =>
             {
+                AllowCors(context.Context);
+                var username = ReadAuthenticationData(context.Context);
+                Console.WriteLine(username);
                 CheckLoggedInAndDo(context,serveritoContext => 
                     Utils
                         .WriteToResponse(context.Context,new RequestService()
-                        .AskForDoorToOpen()));
+                        .AskForDoorToOpen(username)));
             } );
+            server.AddView(new URL("/logout", HttpMethods.POST), context =>
+            {
+                AllowCors(context.Context);
+                CheckLoggedInAndDo(context, serveritoContext =>
+                {
+                    new ConnexionService().Logout(ReadAuthenticationData(serveritoContext.Context));
+                    Utils
+                        .WriteToResponse(serveritoContext.Context,"");
+                });
+            });
             server.AddView(new URL("/login",HttpMethods.POST), context =>
             {
+                AllowCors(context.Context);
                 var maybeUsr = JsonConvert.DeserializeObject<User>(ReadBodyToString(context.Context));
                 if (maybeUsr.username is null || maybeUsr.password is null)
                 {
@@ -56,14 +73,18 @@ namespace Visitor
                 }
                 else
                 {
-                    loggedInUsers.Add(user.username,user);
-                    Utils.WriteToResponse(context.Context,user.username);     
+                    Utils.WriteToResponse(context.Context,System.Text.Json.JsonSerializer.Serialize(user));     
                 } 
             });
             server.Start();
             Console.WriteLine("Visitor Server ready");
         }
-        
+        private static void AllowCors(HttpListenerContext ctx)
+        {
+            ctx.Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            ctx.Response.Headers.Add("Access-Control-Allow-Methods","GET,PUT,POST,DELETE,PATCH,OPTIONS");
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin","*");
+        }
         private static string ReadBodyToString(HttpListenerContext ctx)
         {
             return Utils.ReadRequestInput(ctx);
@@ -83,7 +104,7 @@ namespace Visitor
             {
                 return false;
             }
-            return loggedInUsers.ContainsKey(hash);
+            return new ConnexionService().CheckIfLoggedIn(hash);
         }
 
         private static void CheckLoggedInAndDo(ServeritoContext context,ViewFunction func)

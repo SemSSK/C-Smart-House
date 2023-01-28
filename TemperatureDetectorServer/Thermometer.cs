@@ -7,7 +7,8 @@ namespace TemperatureDetectorServer
     public class Thermometer : MarshalByRefObject ,IIotViewer<double>
     {
         public bool state = true;
-        public double temperature = 24.2;
+        private double min = 20.0;
+        private double max = 25.0;
 
         public void TurnOn()
         {
@@ -20,6 +21,6 @@ namespace TemperatureDetectorServer
         }
 
         public double GetValue() =>
-            temperature;
+            RandomInRange.Generate(min,max);
     }
 }

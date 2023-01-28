@@ -93,14 +93,17 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="DatabaseConnector.cs" />
+        <Compile Include="DoorRequest.cs" />
         <Compile Include="IAccountManager.cs" />
         <Compile Include="IIotManager.cs" />
         <Compile Include="IIotViewer.cs" />
+        <Compile Include="IMovementCapture.cs" />
         <Compile Include="IRequestManager.cs" />
-        <Compile Include="MovementData.cs" />
+        <Compile Include="LoggedInStated.cs" />
         <Compile Include="Names.cs" />
         <Compile Include="Ports.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="RandomInRange.cs" />
         <Compile Include="RemotingUrlBuilder.cs" />
         <Compile Include="User.cs" />
     </ItemGroup>

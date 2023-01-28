@@ -7,30 +7,27 @@ using System.Runtime.Remoting.Channels.Tcp;
 using Interfaces;
 using Newtonsoft.Json;
 using Serverito;
-using System.Text.Json;
 
 namespace AdminServer
 {
     internal class Program
     {
-        
-        private static Dictionary<string, User> loggedInUsers = new Dictionary<string, User>();
-        
         public static void Main(string[] args)
         {
+            var server = new ServeritoListener("http://localhost:8001/");
             var channel = new TcpChannel(Ports.REQPORT);
             ChannelServices.RegisterChannel(channel);
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(RequestManager),Names.REQNAME,WellKnownObjectMode.Singleton);
-
-            var server = new ServeritoListener("http://localhost:8001/");
+            RemotingConfiguration.RegisterWellKnownServiceType(typeof(RequestManager), Names.REQNAME,
+                WellKnownObjectMode.Singleton);
             Console.WriteLine("Admin Server ready listening on http://localhost:8001/");
-            new ConnexionService().GetUsers().ForEach(user =>
+            server.AddView(new URL("/",HttpMethods.OPTIONS,UrlMatchingType.StartsWith), context =>
             {
-                Console.WriteLine(user.username);
+                AllowCors(context.Context);
+                Utils.WriteToResponse(context.Context,"");
             });
             server.AddView(new URL("/temperature",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context,serveritoContext => 
                     Utils
                     .WriteToResponse(context.Context,new TemperatureViewer().GetTemperature()
@@ -40,6 +37,7 @@ namespace AdminServer
             } );
             server.AddView(new URL("/humidity",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context,serveritoContext => 
                     Utils
                         .WriteToResponse(context.Context,new HumidityViewer()
@@ -49,11 +47,12 @@ namespace AdminServer
             } );
             server.AddView(new URL("/alert",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     Utils
                         .WriteToResponse(serveritoContext.Context,
-                            JsonConvert.SerializeObject(new MovementCapture().GetCaptures()));
+                            System.Text.Json.JsonSerializer.Serialize(new MovementCapture().GetCaptures()));
                 });
             });
             
@@ -61,16 +60,31 @@ namespace AdminServer
             //Door controller
             server.AddView(new URL("/door",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     var req = RequestManager.getRequest();
+                    var json = System.Text.Json.JsonSerializer.Serialize(req);
                     Utils
-                        .WriteToResponse(serveritoContext.Context,
-                            req ?? "");
+                        .WriteToResponse(serveritoContext.Context,json);
+                });
+            });
+            server.AddView(new URL("/lock",HttpMethods.GET), context =>
+            {
+                AllowCors(context.Context);
+                CheckLoggedInAndDo(context, serveritoContext =>
+                {
+                    var state =  new
+                    {
+                        state = new DoorService().GetLockState()
+                    };
+                    Utils.WriteToResponse(serveritoContext.Context,
+                        System.Text.Json.JsonSerializer.Serialize(state));
                 });
             });
             server.AddView(new URL("/door/open",HttpMethods.POST), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     new DoorService().TurnOn();
@@ -79,6 +93,7 @@ namespace AdminServer
             });
             server.AddView(new URL("/door/close",HttpMethods.POST), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     new DoorService().TurnOff();
@@ -89,6 +104,7 @@ namespace AdminServer
             //Users Controller
             server.AddView(new URL("/user",HttpMethods.GET), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     var json = System.Text.Json.JsonSerializer.Serialize(new ConnexionService().GetUsers());
@@ -97,6 +113,7 @@ namespace AdminServer
             });
             server.AddView(new URL("/user",HttpMethods.POST), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     var user = JsonConvert.DeserializeObject<User>(ReadBodyToString(serveritoContext.Context));
@@ -107,8 +124,23 @@ namespace AdminServer
                     Utils.WriteToResponse(serveritoContext.Context,"");
                 });
             });
+            server.AddView(new URL("/user",HttpMethods.PUT), context =>
+            {
+                AllowCors(context.Context);
+                CheckLoggedInAndDo(context, serveritoContext =>
+                {
+                    var user = JsonConvert.DeserializeObject<User>(ReadBodyToString(serveritoContext.Context));
+                    if (user != null)
+                    {
+                        Console.WriteLine("updating user");
+                        new ConnexionService().UpdateUser(user);
+                    }
+                    Utils.WriteToResponse(serveritoContext.Context,"");
+                });
+            });
             server.AddView(new URL("/user",HttpMethods.DELETE), context =>
             {
+                AllowCors(context.Context);
                 CheckLoggedInAndDo(context, serveritoContext =>
                 {
                     var user = JsonConvert.DeserializeObject<User>(ReadBodyToString(serveritoContext.Context));
@@ -123,6 +155,7 @@ namespace AdminServer
             //Login controller
             server.AddView(new URL("/login",HttpMethods.POST), context =>
             {
+                AllowCors(context.Context);
                 var maybeUsr = JsonConvert.DeserializeObject<User>(ReadBodyToString(context.Context));
                 if (maybeUsr.username is null || maybeUsr.password is null)
                 {
@@ -137,9 +170,18 @@ namespace AdminServer
                 }
                 else
                 {
-                    loggedInUsers.Add(user.username,user);
-                    Utils.WriteToResponse(context.Context,user.username);     
-                } 
+                    Utils.WriteToResponse(context.Context,System.Text.Json.JsonSerializer.Serialize(user));     
+                }
+            });
+            server.AddView(new URL("/logout", HttpMethods.POST), context =>
+            {
+                AllowCors(context.Context);
+                CheckLoggedInAndDo(context, serveritoContext =>
+                {
+                    new ConnexionService().Logout(ReadAuthenticationData(serveritoContext.Context));
+                    Utils
+                        .WriteToResponse(serveritoContext.Context,"");
+                });
             });
             
             server.Start();
@@ -158,13 +200,20 @@ namespace AdminServer
             return key;
         }
 
+        private static void AllowCors(HttpListenerContext ctx)
+        {
+            ctx.Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            ctx.Response.Headers.Add("Access-Control-Allow-Methods","GET,PUT,POST,DELETE,PATCH,OPTIONS");
+            ctx.Response.Headers.Add("Access-Control-Allow-Origin","*");
+        }
         private static bool CheckIfLoggedIn(string hash)
         {
             if (hash is null)
             {
                 return false;
             }
-            return loggedInUsers.ContainsKey(hash) && loggedInUsers[hash].isAdmin;
+
+            return new ConnexionService().CheckIfLoggedIn(hash);
         }
 
         private static void CheckLoggedInAndDo(ServeritoContext context,ViewFunction func)

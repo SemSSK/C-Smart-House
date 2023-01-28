@@ -86,6 +86,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="CameraService.cs" />
+        <Compile Include="DatabaseAccessor.cs" />
         <Compile Include="DoorService.cs" />
         <Compile Include="MovementCaptureService.cs" />
         <Compile Include="Program.cs" />

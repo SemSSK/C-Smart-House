@@ -7,7 +7,7 @@ namespace Visitor
     public class ConnexionService
     {
         private IAccountManager accountManager;
-
+        
         public ConnexionService()
         {
             accountManager = (IAccountManager) Activator.GetObject(
@@ -17,6 +17,11 @@ namespace Visitor
 
         public User Login(string username, string password) =>
             accountManager.Login(username, password);
+
+        public bool CheckIfLoggedIn(string key) =>
+            accountManager.CheckState(key) == LoggedInStated.AsVisitor;
+        public void Logout(string key) =>
+            accountManager.LogOut(key);
 
     }
 }

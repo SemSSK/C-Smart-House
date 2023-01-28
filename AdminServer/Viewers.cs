@@ -53,8 +53,8 @@ namespace AdminServer
                     RemotingUrlBuilder.GetUrl(Ports.SECUREPORT, Names.DOORNAME));
         }
 
-        public Result<bool> GetLockState() =>
-            Result.Ok(doorViewer.GetValue());
+        public bool GetLockState() =>
+            doorViewer.GetValue();
         
         public void TurnOn() => doorViewer.TurnOn();
         public void TurnOff() => doorViewer.TurnOff();
@@ -62,17 +62,17 @@ namespace AdminServer
     
     public class MovementCapture
     {
-        private IIotViewer<List<MovementData>> capViewer;
+        private IMovementCapture capViewer;
 
         public MovementCapture()
         {
-            capViewer = (IIotViewer<List<MovementData>>)Activator
-                .GetObject(typeof(IIotViewer<List<MovementData>>),
+            capViewer = (IMovementCapture)Activator
+                .GetObject(typeof(IMovementCapture),
                     RemotingUrlBuilder.GetUrl(Ports.SECUREPORT, Names.MOVENAME));
         }
 
-        public Result<List<MovementData>> GetCaptures() =>
-            Result.Ok(capViewer.GetValue());
+        public List<string> GetCaptures() =>
+            capViewer.GetValue();
         
         public void TurnOn() => capViewer.TurnOn();
         public void TurnOff() => capViewer.TurnOff();

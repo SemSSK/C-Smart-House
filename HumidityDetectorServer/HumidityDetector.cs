@@ -6,8 +6,9 @@ namespace HumidityDetectorServer
 {
     public class HumidityDetector : MarshalByRefObject, IIotViewer<double>
     {
-        public bool state = true;
-        public double value = 43.5;
+        bool state = true;
+        private double min = 40.0;
+        private double max = 45;
         
         public void TurnOn()
         {
@@ -20,6 +21,6 @@ namespace HumidityDetectorServer
         }
 
         public double GetValue() =>
-            value;
+            RandomInRange.Generate(min,max);
     }
 }
