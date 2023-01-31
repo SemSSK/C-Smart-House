@@ -12,7 +12,7 @@ namespace MovementCaptureDevice
             {
                 new SecurityServer.DatabaseAccessor().AddMoCap(DateTime.Now.ToString());
                 Console.WriteLine("Movement captured");
-                System.Threading.Thread.Sleep(Convert.ToInt32(Math.Floor(RandomInRange.Generate(0, 30000))));
+                System.Threading.Thread.Sleep(Convert.ToInt32(Math.Floor(RandomInRange.Generate(10000, 30000))));
             }
         }
     }
